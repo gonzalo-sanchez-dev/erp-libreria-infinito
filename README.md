@@ -78,3 +78,8 @@ Para ver el presupuesto dentro de la demo:
 3. Usar `Abrir presupuesto en pestaña nueva` o `Imprimir / guardar PDF` si se desea exportarlo.
 
 El archivo del presupuesto se encuentra en `presupuesto-erp-infinito-libros-final.html`.
+
+
+## Corrección visual incluida
+
+El menú lateral permite desplazamiento interno cuando el perfil de Dueña muestra más opciones, para que se puedan ver todos los módulos, incluido Presupuesto.
