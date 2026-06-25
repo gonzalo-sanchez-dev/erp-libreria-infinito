@@ -83,3 +83,8 @@ El archivo del presupuesto se encuentra en `presupuesto-erp-infinito-libros-fina
 ## Corrección visual incluida
 
 El menú lateral permite desplazamiento interno cuando el perfil de Dueña muestra más opciones, para que se puedan ver todos los módulos, incluido Presupuesto.
+
+
+## Corrección de menú lateral
+
+El menú lateral queda fijo en escritorio y la lista de opciones tiene scroll interno. La opción `Presupuesto` está ubicada arriba para facilitar la presentación comercial.

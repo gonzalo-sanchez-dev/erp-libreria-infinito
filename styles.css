@@ -53,8 +53,7 @@ button {
 }
 
 .app-shell {
-  display: grid;
-  grid-template-columns: 280px 1fr;
+  display: block;
   min-height: 100vh;
 }
 
@@ -65,10 +64,16 @@ button {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  width: 280px;
   height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
   overflow: hidden;
+  z-index: 40;
 }
 
 .brand {
@@ -107,7 +112,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
@@ -168,7 +173,8 @@ button {
 }
 
 .sidebar-user {
-  margin-top: auto;
+  flex: 0 0 auto;
+  margin-top: 0;
   background: rgba(255, 252, 247, 0.1);
   border: 1px solid rgba(255, 252, 247, 0.12);
   border-radius: 18px;
@@ -198,6 +204,7 @@ button {
 
 .main {
   min-width: 0;
+  margin-left: 280px;
   padding: 26px 30px 42px;
 }
 
@@ -803,7 +810,7 @@ button {
   }
 
   .app-shell {
-    grid-template-columns: 1fr;
+    display: block;
   }
 
   .sidebar {
@@ -813,6 +820,8 @@ button {
     left: 0;
     top: 0;
     width: min(310px, 88vw);
+    height: 100dvh;
+    max-height: 100dvh;
   }
 
   .sidebar.open {
@@ -820,6 +829,7 @@ button {
   }
 
   .main {
+    margin-left: 0;
     padding: 18px 16px 32px;
   }
 
@@ -970,5 +980,17 @@ button {
   .budget-frame {
     height: 75vh;
     min-height: 600px;
+  }
+}
+
+
+/* sidebar-bottom-fix-marker: mantiene el menú fijo y con scroll interno en desktop */
+@media (min-width: 861px) {
+  .sidebar {
+    overscroll-behavior: contain;
+  }
+
+  .nav {
+    padding-bottom: 6px;
   }
 }

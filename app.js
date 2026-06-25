@@ -389,6 +389,7 @@ function renderMetric(label, value, note = "") {
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", roles: ["admin", "seller"] },
+  { id: "budget", label: "Presupuesto", roles: ["admin"] },
   { id: "sales", label: "Ventas", roles: ["admin", "seller"] },
   { id: "newSale", label: "Nueva venta", roles: ["admin", "seller"] },
   { id: "cash", label: "Caja actual", roles: ["admin", "seller"] },
@@ -403,7 +404,6 @@ const menuItems = [
   { id: "reports", label: "Reportes", roles: ["admin", "seller"] },
   { id: "users", label: "Usuarios", roles: ["admin"] },
   { id: "settings", label: "Configuración", roles: ["admin"] },
-  { id: "budget", label: "Presupuesto", roles: ["admin"] },
 ];
 
 function canAccess(view) {
