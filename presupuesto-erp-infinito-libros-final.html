@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presupuesto - Sistema de Gestión Infinito Libros</title>
+  <style>
+    :root {
+      --primary: #2f3a2f;
+      --primary-2: #243024;
+      --secondary: #6f7d5c;
+      --accent: #b89b5e;
+      --accent-soft: #f4ead5;
+      --bg: #f7f3ea;
+      --paper: #ffffff;
+      --text: #252525;
+      --muted: #6f6f6f;
+      --line: #e2ded4;
+      --soft: #faf8f2;
+      --success-bg: #f6faf4;
+      --success-line: #d9e8d0;
+      --warning-bg: #fffaf0;
+      --warning-line: #ead6a7;
+      --info-bg: #eef5f4;
+      --info-line: #cfe0dd;
+      --danger-bg: #fff4f2;
+      --danger-line: #ecc2bc;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    .print-bar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 12px;
+      background: rgba(247,243,234,.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+    }
+    .btn {
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn:hover { background: var(--primary-2); }
+    .page {
+      max-width: 1080px;
+      margin: 40px auto;
+      padding: 40px;
+      background: var(--paper);
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.08);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      gap: 32px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand h1 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 32px;
+      letter-spacing: -.5px;
+    }
+    .brand p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 720px;
+    }
+    .quote-box {
+      text-align: right;
+      min-width: 250px;
+    }
+    .quote-box .label {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .quote-box .number {
+      margin-top: 6px;
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .section { margin-top: 34px; }
+    .section h2 {
+      margin: 0 0 16px;
+      color: var(--primary);
+      font-size: 22px;
+      border-left: 4px solid var(--accent);
+      padding-left: 12px;
+    }
+    .section h3 {
+      margin: 22px 0 10px;
+      color: var(--primary);
+      font-size: 18px;
+    }
+    .lead {
+      margin: 0;
+      color: #3a3a3a;
+      font-size: 16px;
+    }
+    .note {
+      margin-top: 16px;
+      padding: 16px 18px;
+      background: var(--soft);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      color: #5d5d5d;
+    }
+    .note strong { color: #2d2d2d; }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 13px;
+      color: #4c4c4c;
+      font-weight: 600;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .grid.two { grid-template-columns: repeat(2, 1fr); }
+    .card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 10px 24px rgba(0,0,0,.04);
+    }
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-size: 17px;
+    }
+    .card p { margin: 0; color: #555; font-size: 14px; }
+    .price {
+      margin-top: 12px;
+      color: var(--primary);
+      font-size: 24px;
+      font-weight: 800;
+    }
+    .tag {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .tag.base { background: var(--success-bg); border: 1px solid var(--success-line); color: #315c37; }
+    .tag.rec { background: var(--warning-bg); border: 1px solid var(--warning-line); color: #7a5a17; }
+    .tag.opt { background: var(--info-bg); border: 1px solid var(--info-line); color: #2f5d59; }
+    .tag.max { background: #f7eef6; border: 1px solid #e8d1e6; color: #71426c; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    thead th {
+      background: var(--primary);
+      color: #fff;
+      padding: 14px;
+      text-align: left;
+      font-size: 14px;
+    }
+    tbody td {
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 14px;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    td strong { color: #1f1f1f; }
+    .amount {
+      white-space: nowrap;
+      font-weight: 800;
+      color: #111;
+      text-align: right;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .included, .excluded {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px 18px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .included li, .excluded li {
+      position: relative;
+      padding-left: 24px;
+      color: #4a4a4a;
+      font-size: 14px;
+    }
+    .included li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #2e7d5b;
+      font-weight: 800;
+    }
+    .excluded li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #9a6a2a;
+      font-weight: 800;
+    }
+    .highlight {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-line);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .highlight.info {
+      background: var(--info-bg);
+      border: 1px solid var(--info-line);
+    }
+    .highlight h3 { margin-top: 0; color: var(--primary); }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .soft-box {
+      padding: 18px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+    .footer {
+      margin-top: 38px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    @media (max-width: 840px) {
+      .page { margin: 0; border-radius: 0; padding: 24px; }
+      .header, .two-col { grid-template-columns: 1fr; display: grid; }
+      .quote-box { text-align: left; }
+      .grid, .grid.two { grid-template-columns: 1fr; }
+      .included, .excluded { grid-template-columns: 1fr; }
+      table { font-size: 13px; }
+    }
+    @media print {
+      body { background: #fff; }
+      .print-bar { display: none; }
+      .page { margin: 0; max-width: none; box-shadow: none; border-radius: 0; padding: 24px; }
+      .section { break-inside: avoid; }
+      .card, .highlight, .note, .soft-box { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-bar">
+    <button class="btn" onclick="window.print()">Guardar / Imprimir PDF</button>
+  </div>
+
+  <main class="page">
+    <header class="header">
+      <div class="brand">
+        <h1>Presupuesto: Sistema de Gestión para Infinito Libros</h1>
+        <p>Propuesta por etapas para implementar un sistema propio de ventas, caja, stock, pedidos y automatizaciones operativas, adaptado a una librería de una sucursal y equipo reducido.</p>
+      </div>
+      <div class="quote-box">
+        <div class="label">Propuesta comercial</div>
+        <div class="number">Sistema web privado</div>
+        <div class="muted">1 sucursal · 3 vendedoras · 1 dueña</div>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2>Enfoque de la propuesta</h2>
+      <p class="lead">La propuesta se divide en un sistema base operativo y módulos adicionales. Esto permite comenzar con una versión útil para el trabajo diario y sumar automatizaciones según prioridad.</p>
+      <div class="note"><strong>Importante:</strong> la demo presentada funciona como referencia visual. El sistema real requiere desarrollo con base de datos, usuarios reales, seguridad, pruebas, publicación y capacitación.</div>
+      <div class="pill-row">
+        <span class="pill">Ventas</span>
+        <span class="pill">Caja</span>
+        <span class="pill">Stock por ISBN</span>
+        <span class="pill">Lector de códigos incluido</span>
+        <span class="pill">Pedidos de clientes</span>
+        <span class="pill">Precios por planilla</span>
+        <span class="pill">Comprobante imprimible</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Resumen de alternativas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Alternativa</th>
+            <th>Incluye</th>
+            <th class="amount">Importe</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sistema base operativo</strong></td>
+            <td>Ventas, caja, stock por ISBN, lector de códigos, pedidos de clientes, usuarios, reportes básicos, comprobante interno imprimible, publicación inicial, capacitación y soporte correctivo inicial.</td>
+            <td class="amount">USD 1.600</td>
+          </tr>
+          <tr>
+            <td><strong>Paquete recomendado</strong></td>
+            <td>Sistema base + actualización masiva de precios por ISBN + consulta/carga asistida Top 10 Cúspide + módulo de tutoriales internos.</td>
+            <td class="amount">USD 2.350</td>
+          </tr>
+          <tr>
+            <td><strong>Paquete operativo ampliado</strong></td>
+            <td>Paquete recomendado + carga asistida de libros por remito PDF/imagen + revisión manual antes de confirmar ingresos de stock y precios.</td>
+            <td class="amount">USD 3.050</td>
+          </tr>
+          <tr>
+            <td><strong>Paquete completo inicial</strong></td>
+            <td>Paquete operativo ampliado + integración inicial de facturación electrónica ARCA real, con alcance acotado y validación técnica/fiscal previa.</td>
+            <td class="amount">USD 3.950</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">Los valores están expresados en dólares estadounidenses para mantener estabilidad del presupuesto. El pago podrá realizarse en pesos argentinos al tipo de cambio acordado al momento de cada pago.</div>
+    </section>
+
+    <section class="section">
+      <h2>Opción recomendada para comenzar</h2>
+      <div class="two-col">
+        <div class="highlight">
+          <h3>Paquete recomendado</h3>
+          <p>Es la opción más conveniente para una primera implementación, porque cubre ventas, caja, stock, pedidos y suma herramientas muy útiles para la operatoria diaria: actualización de precios por ISBN, revisión del Top 10 Cúspide y tutoriales internos para las usuarias.</p>
+          <div class="price">USD 2.350</div>
+        </div>
+        <div class="highlight info">
+          <h3>Implementación por etapas</h3>
+          <p>No es necesario implementar todo desde el primer día. Se puede iniciar con el sistema base o recomendado, validar el uso real y luego sumar remitos, ARCA o WhatsApp según necesidad.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Sistema base operativo</h2>
+      <div class="grid">
+        <div class="card">
+          <span class="tag base">Base</span>
+          <h3>Ventas y comprobante interno</h3>
+          <p>Registro de ventas, búsqueda de libros, carrito, descuentos, medios de pago y comprobante interno imprimible sin validez fiscal.</p>
+        </div>
+        <div class="card">
+          <span class="tag base">Base</span>
+          <h3>Lector de códigos incluido</h3>
+          <p>Preparación del sistema para usar pistola lectora de códigos de barras/ISBN en ventas y consulta de stock. El hardware no está incluido.</p>
+        </div>
+        <div class="card">
+          <span class="tag base">Base</span>
+          <h3>Caja diaria</h3>
+          <p>Apertura, ingresos por ventas, egresos, retiros, cierre, diferencias y movimientos asociados a cada usuaria.</p>
+        </div>
+        <div class="card">
+          <span class="tag base">Base</span>
+          <h3>Stock por ISBN</h3>
+          <p>Inventario de libros con título, autor, ISBN, editorial, categoría, precio, ubicación, stock actual y stock mínimo.</p>
+        </div>
+        <div class="card">
+          <span class="tag base">Base</span>
+          <h3>Pedidos de clientes</h3>
+          <p>Registro de pedidos con fecha, libro solicitado, link opcional, precio acordado, cliente, teléfono, observación y estado.</p>
+        </div>
+        <div class="card">
+          <span class="tag base">Base</span>
+          <h3>Usuarios y reportes básicos</h3>
+          <p>Roles simples: dueña y vendedoras. Reportes básicos de ventas, caja, stock bajo, ventas por vendedora y libros más vendidos.</p>
+        </div>
+      </div>
+      <div class="price">Valor sistema base: USD 1.600</div>
+    </section>
+
+    <section class="section">
+      <h2>Adicionales cotizados por módulo</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Módulo adicional</th>
+            <th>Detalle</th>
+            <th class="amount">Importe</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Actualización masiva de precios por ISBN</strong></td>
+            <td>Carga de planilla del proveedor, validación de ISBN, comparación contra precio actual y actualización masiva de precios sugeridos. Incluye pantalla de revisión antes de aplicar cambios.</td>
+            <td class="amount">USD 350</td>
+          </tr>
+          <tr>
+            <td><strong>Consulta / carga asistida Top 10 Cúspide</strong></td>
+            <td>Consulta o carga asistida del ranking Top 10 para identificar libros con descuento especial. Si el sitio externo cambia o bloquea el acceso, se utilizará una alternativa manual/asistida.</td>
+            <td class="amount">USD 250</td>
+          </tr>
+          <tr>
+            <td><strong>Tutoriales e instructivos internos</strong></td>
+            <td>Apartado para subir, enlazar y clasificar videos de uso del sistema: ventas, caja, stock, pedidos, precios y situaciones cotidianas.</td>
+            <td class="amount">USD 150</td>
+          </tr>
+          <tr>
+            <td><strong>Carga asistida por remito PDF/imagen</strong></td>
+            <td>Subida de remito, detección asistida de libros y grilla de revisión para confirmar ISBN, cantidades, precios y ubicación antes de actualizar stock. Requiere revisión humana.</td>
+            <td class="amount">USD 700</td>
+          </tr>
+          <tr>
+            <td><strong>Facturación electrónica ARCA real</strong></td>
+            <td>Integración inicial para emisión de comprobantes desde el sistema. Alcance acotado a una empresa, una sucursal y un punto de venta, sujeto a relevamiento fiscal y pruebas de homologación.</td>
+            <td class="amount">USD 900</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Complemento opcional: WhatsApp con IA</h2>
+      <div class="soft-box">
+        <p class="lead">Se puede incorporar una automatización para responder consultas frecuentes por WhatsApp y consultar datos del sistema, como stock, precio y ubicación de libros. Este complemento requiere que el sistema de gestión esté implementado, ya que necesita consultar la información del ERP.</p>
+        <table style="margin-top:16px;">
+          <thead>
+            <tr>
+              <th>Complemento</th>
+              <th>Incluye</th>
+              <th class="amount">Importe</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>WhatsApp + IA conectado al ERP</strong></td>
+              <td>Automatización con n8n e IA para recibir consultas, interpretar mensajes, consultar stock/precio en el ERP, responder al cliente y derivar a una persona cuando corresponda. Incluye flujo inicial de preguntas frecuentes y registro de consultas.</td>
+              <td class="amount">USD 950</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="note"><strong>Aclaración:</strong> este complemento no se incluye dentro de los paquetes principales para no elevar la inversión inicial. Costos externos de WhatsApp/Meta, IA, hosting o servicios de terceros no están incluidos.</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Detalle de paquetes</h2>
+      <div class="grid two">
+        <div class="card">
+          <span class="tag base">USD 1.600</span>
+          <h3>Sistema base operativo</h3>
+          <p>Para comenzar con ventas, caja, stock, pedidos, lector de códigos y comprobante interno imprimible.</p>
+        </div>
+        <div class="card">
+          <span class="tag rec">USD 2.350</span>
+          <h3>Paquete recomendado</h3>
+          <p>Agrega automatizaciones de alto impacto para la librería: precios por ISBN, Top 10 Cúspide y tutoriales internos.</p>
+        </div>
+        <div class="card">
+          <span class="tag opt">USD 3.050</span>
+          <h3>Paquete operativo ampliado</h3>
+          <p>Incluye carga asistida por remitos para reducir tareas manuales de ingreso de libros, manteniendo revisión humana.</p>
+        </div>
+        <div class="card">
+          <span class="tag max">USD 3.950</span>
+          <h3>Paquete completo inicial</h3>
+          <p>Incluye automatizaciones principales y una primera integración de facturación electrónica ARCA.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Incluye</h2>
+      <ul class="included">
+        <li>Relevamiento inicial del flujo de trabajo de la librería.</li>
+        <li>Diseño funcional y visual de pantallas.</li>
+        <li>Desarrollo del sistema según el paquete contratado.</li>
+        <li>Roles simples: dueña y vendedoras.</li>
+        <li>Base de datos real para ventas, caja, stock y pedidos.</li>
+        <li>Publicación inicial del sistema web privado.</li>
+        <li>Capacitación inicial de uso.</li>
+        <li>Soporte correctivo durante 30 días posteriores a la entrega.</li>
+        <li>Hasta 2 rondas de ajustes menores dentro del alcance aprobado.</li>
+        <li>Documentación básica de uso para operaciones principales.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>No incluye</h2>
+      <ul class="excluded">
+        <li>Hardware: lector de códigos, impresora, PC, dominio, hosting o servicios externos.</li>
+        <li>Carga completa del catálogo histórico si no se entrega una planilla ordenada.</li>
+        <li>Cambios ilimitados o funcionalidades no detalladas en el paquete aprobado.</li>
+        <li>OCR automático sin revisión humana para remitos.</li>
+        <li>Costos externos de servicios de terceros.</li>
+        <li>Soporte mensual permanente luego del período correctivo inicial.</li>
+        <li>Configuración fiscal, clave fiscal o datos impositivos del cliente.</li>
+        <li>Operación multi-sucursal, multiempresa o contabilidad avanzada.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Forma de pago sugerida</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Instancia</th>
+            <th>Detalle</th>
+            <th class="amount">Porcentaje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Inicio</strong></td>
+            <td>Confirmación del proyecto, relevamiento y comienzo del desarrollo.</td>
+            <td class="amount">40%</td>
+          </tr>
+          <tr>
+            <td><strong>Avance funcional</strong></td>
+            <td>Entrega de versión funcional con ventas, caja, stock y pedidos funcionando.</td>
+            <td class="amount">30%</td>
+          </tr>
+          <tr>
+            <td><strong>Entrega final</strong></td>
+            <td>Publicación, capacitación, ajustes finales y puesta en uso.</td>
+            <td class="amount">30%</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Mantenimiento opcional</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Plan</th>
+            <th>Incluye</th>
+            <th class="amount">Mensual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Soporte básico</strong></td>
+            <td>Correcciones menores, dudas de uso y revisión general.</td>
+            <td class="amount">USD 80</td>
+          </tr>
+          <tr>
+            <td><strong>Soporte operativo</strong></td>
+            <td>Soporte básico + pequeños ajustes evolutivos y acompañamiento mensual.</td>
+            <td class="amount">USD 130</td>
+          </tr>
+          <tr>
+            <td><strong>Soporte con mejoras</strong></td>
+            <td>Soporte operativo + bolsa mensual limitada de horas para mejoras, reportes o ajustes nuevos.</td>
+            <td class="amount">USD 180</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">El mantenimiento no es obligatorio para iniciar el proyecto, pero se recomienda si el sistema queda en uso diario para ventas, caja y stock.</div>
+    </section>
+
+    <section class="section">
+      <h2>Plazo estimado</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Paquete</th>
+            <th>Plazo estimado</th>
+            <th>Condición</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sistema base operativo</strong></td>
+            <td>5 a 7 semanas</td>
+            <td>Dependiendo de la disponibilidad para validar pantallas y pruebas.</td>
+          </tr>
+          <tr>
+            <td><strong>Paquete recomendado</strong></td>
+            <td>7 a 9 semanas</td>
+            <td>Incluye validación de planillas de precios y flujo Top 10.</td>
+          </tr>
+          <tr>
+            <td><strong>Paquete operativo ampliado</strong></td>
+            <td>8 a 11 semanas</td>
+            <td>Incluye carga asistida por remitos y pruebas de revisión manual.</td>
+          </tr>
+          <tr>
+            <td><strong>Paquete completo inicial</strong></td>
+            <td>10 a 13 semanas</td>
+            <td>Sujeto a disponibilidad de datos fiscales y pruebas ARCA.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Validez de la propuesta</h2>
+      <p class="lead">La propuesta tiene una validez de 15 días corridos. Los valores pueden ajustarse si cambia el alcance funcional, si se agregan integraciones externas o si surgen requisitos no contemplados en esta etapa.</p>
+    </section>
+
+    <footer class="footer">
+      <div>Presupuesto preparado para Infinito Libros.</div>
+      <div>Sistema de gestión por etapas · Desarrollo web personalizado</div>
+    </footer>
+  </main>
+</body>
+</html>
